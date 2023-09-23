@@ -66,25 +66,33 @@
         flow)))
 
 (define chatbot
-  (lambda (chatbotid name welcomeMessage . flows)
+  (lambda (chatbotid name welcomeMessage startFlowId . flows)
     (cond
-      [(null? flows) (list chatbotid name welcomeMessage)]
-      [(= (length flows) 1) (list chatbotid name welcomeMessage flows)]
-      [else (list chatbotid name welcomeMessage (flow-dup(remove-duplicates flows) (list )))])))
+      [(null? flows) (list chatbotid name welcomeMessage startFlowId)]
+      [(= (length flows) 1) (list chatbotid name welcomeMessage startFlowId flows)]
+      [else (list chatbotid name welcomeMessage startFlowId (flow-dup(remove-duplicates flows) (list )))])))
 
 (define flow-dup
   (lambda (flows aux)
     (if (eq? flows null)
         aux
         (if (boolean? (member (caar flows ) (map flow-id (cdr flows))))
-            (flow-dup (cdr flows) (append aux (list (car flows))))
+            (flow-dup (cdr flows) (append aux  (car flows)))
             (flow-dup (cdr flows) aux)
             )) ))
 
 (define chatbot-add-flow
   (lambda (chatbot flow)
-    (chatbot-flows chatbot)))
+    (list (chatbot-chatbotid chatbot) (chatbot-name chatbot) (chatbot-welcomeMessage chatbot) (chatbot-startFlowId chatbot) (flow-dup-cb flow (chatbot-flows chatbot) (list )))))
 
+(define flow-dup-cb
+  (lambda (new-flow flows aux)
+    (if (eq? flows null)
+        (append new-flow flows)
+        (if (boolean? (member (car new-flow ) (map flow-id (cdr flows))))
+            flows
+            (flow-dup  new-flow (cdr flows) (append aux  (car flows)))
+            )) ))
 (define chatbot-chatbotid
   (lambda (chatbot)
     (car chatbot)))
@@ -96,10 +104,12 @@
 (define chatbot-welcomeMessage
   (lambda (chatbot)
     (caddr chatbot)))
-
-(define chatbot-flows
+(define chatbot-startFlowId
   (lambda (chatbot)
     (cadddr chatbot)))
+(define chatbot-flows
+  (lambda (chatbot)
+    (car(cddddr chatbot))))
 
 (define op1 (option 1 "Viajar" 2 4 "viajar" "turistear" "conocer"))
 (define op2 (option 2 "vuelo" 2 4 "viajar" "turistear" "conocer"))
@@ -110,7 +120,8 @@
 (define f10 (flow 1 "Flujo1" op1 op2 op2 op1 op3))
 (define f12 (flow 1 "Flujo2" op1 ))
 (define f11 (flow-add-option f10 op4))
+(define f13 (flow 2 "Flujo3" op3))
 (define chatbot1 (chatbot 1 "chatbot1" "Hola" f10 f12))
-(define cb10 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”"))
-(define cb11 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" f12))
+(define cb10 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 2))
+(define cb11 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 1 f12))
 
