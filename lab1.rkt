@@ -88,10 +88,10 @@
 (define flow-dup-cb
   (lambda (new-flow flows aux)
     (if (eq? flows null)
-        (append new-flow flows)
-        (if (boolean? (member (car new-flow ) (map flow-id (cdr flows))))
+        (append aux (list new-flow))
+        (if (boolean? (member (flow-id new-flow) (map flow-id flows)))
+            (flow-dup-cb  new-flow (cdr flows) (append aux  (car flows)))
             flows
-            (flow-dup  new-flow (cdr flows) (append aux  (car flows)))
             )) ))
 (define chatbot-chatbotid
   (lambda (chatbot)
@@ -111,6 +111,39 @@
   (lambda (chatbot)
     (car(cddddr chatbot))))
 
+(define system
+  (lambda (name InitialChatbotCodeLink . chatbot)
+    (cond
+      [(null? chatbot) (list name InitialChatbotCodeLink (list ))]
+      [(= (length chatbot) 1) (list name InitialChatbotCodeLink chatbot)]
+      [else (list name InitialChatbotCodeLink (chatbot-dup chatbot (list )))])))
+
+
+(define system-add-chatbot
+  (lambda (system chatbot)
+    (if (boolean?(member (chatbot-chatbotid chatbot) (map chatbot-chatbotid (system-chatbot system))))
+        (list (system-name system)(system-InitialChatbotCodeLink system)(append (system-chatbot system) (list chatbot)))
+        system)))
+
+
+(define chatbot-dup
+  (lambda (chatbot aux)
+    (if (eq? chatbot null)
+        aux
+        (if (boolean?(member (chatbot-chatbotid (car chatbot)) (map chatbot-chatbotid (cdr chatbot))))
+        (chatbot-dup (cdr chatbot) (append aux (list (car chatbot))))
+        (chatbot-dup (cdr chatbot) aux)))))
+
+(define system-name
+  (lambda (system)
+  (car system)))
+(define system-InitialChatbotCodeLink
+  (lambda (system)
+    (cadr system)))
+
+(define system-chatbot
+  (lambda (system)
+    (caddr system)))
 (define op1 (option 1 "Viajar" 2 4 "viajar" "turistear" "conocer"))
 (define op2 (option 2 "vuelo" 2 4 "viajar" "turistear" "conocer"))
 (define op3 (option 3 "Taxi" 2 4 "viajar" "turistear" "conocer"))
@@ -123,5 +156,7 @@
 (define f13 (flow 2 "Flujo3" op3))
 (define chatbot1 (chatbot 1 "chatbot1" "Hola" f10 f12))
 (define cb10 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 2))
-(define cb11 (chatbot 0 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 1 f12))
+(define cb11 (chatbot 1 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 1 f12))
+(define s0 (system "“NewSystem”" 0))
+(define s1 (system" “NewSystem”" 0 cb11 cb10))
 
