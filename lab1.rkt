@@ -35,7 +35,7 @@
 (define flow
   (lambda(id name . option)
     (cond
-      [(null? option) (list id name)]
+      [(null? option) (list id name (list ))]
       [(= (length option) 1) (list id name option)]
       [else (list id name (option-dup(remove-duplicates option) (list )))])))
 
@@ -68,7 +68,7 @@
 (define chatbot
   (lambda (chatbotid name welcomeMessage startFlowId . flows)
     (cond
-      [(null? flows) (list chatbotid name welcomeMessage startFlowId)]
+      [(null? flows) (list chatbotid name welcomeMessage startFlowId (list))]
       [(= (length flows) 1) (list chatbotid name welcomeMessage startFlowId flows)]
       [else (list chatbotid name welcomeMessage startFlowId (flow-dup(remove-duplicates flows) (list )))])))
 
@@ -114,9 +114,9 @@
 (define system
   (lambda (name InitialChatbotCodeLink . chatbot)
     (cond
-      [(null? chatbot) (list name InitialChatbotCodeLink (list ))]
-      [(= (length chatbot) 1) (list name InitialChatbotCodeLink chatbot)]
-      [else (list name InitialChatbotCodeLink (chatbot-dup chatbot (list )))])))
+      [(null? chatbot) (list name InitialChatbotCodeLink (list ) (list ) (list ) (list ))]
+      [(= (length chatbot) 1) (list name InitialChatbotCodeLink (list ) (list ) (list ) chatbot)]
+      [else (list name InitialChatbotCodeLink (list ) (list ) (list ) (chatbot-dup chatbot (list )))])))
 
 
 (define system-add-chatbot
@@ -133,7 +133,21 @@
         (if (boolean?(member (chatbot-chatbotid (car chatbot)) (map chatbot-chatbotid (cdr chatbot))))
         (chatbot-dup (cdr chatbot) (append aux (list (car chatbot))))
         (chatbot-dup (cdr chatbot) aux)))))
-
+(define user
+  (lambda (name)
+    name))
+(define system-add-user
+  (lambda (system user)
+    (if (boolean? (member user (system-userList system)))
+        (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(append (system-userList system)(list user))(system-loginList system)(system-chatbot system))
+        (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(system-loginList system)(system-chatbot system)))))
+(define system-login
+  (lambda (system user)
+    (if (= (length(system-loginList system)) 0)
+        (if (boolean? (member user (system-userList system)))
+            "Añada el usuario!"
+            (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(append (system-loginList system)(list user))(system-chatbot system)))
+        "Ya existe un usuario activo")))
 (define system-name
   (lambda (system)
   (car system)))
@@ -141,15 +155,26 @@
   (lambda (system)
     (cadr system)))
 
-(define system-chatbot
+(define system-chatHistory
   (lambda (system)
     (caddr system)))
+
+(define system-userList
+  (lambda (system)
+    (cadddr system)))
+(define system-loginList
+  (lambda (system)
+    (car(cddddr system))))
+(define system-chatbot
+  (lambda (system)
+    (car(cdr(cddddr system)))))
+
 (define op1 (option 1 "Viajar" 2 4 "viajar" "turistear" "conocer"))
 (define op2 (option 2 "vuelo" 2 4 "viajar" "turistear" "conocer"))
 (define op3 (option 3 "Taxi" 2 4 "viajar" "turistear" "conocer"))
 (define op4 (option 5 "Taxi" 2 4 "viajar" "turistear" "conocer"))
 
-
+(define f9 (flow 1 "Flujox"))
 (define f10 (flow 1 "Flujo1" op1 op2 op2 op1 op3))
 (define f12 (flow 1 "Flujo2" op1 ))
 (define f11 (flow-add-option f10 op4))
@@ -159,4 +184,7 @@
 (define cb11 (chatbot 1 "“Asistente”" "“Bienvenido\n¿Qué te gustaría hacer?”" 1 f12))
 (define s0 (system "“NewSystem”" 0))
 (define s1 (system" “NewSystem”" 0 cb11 cb10))
-
+(define s2 (system-add-user s1 "“user0”"))
+(define s3 (system-add-user s2 "“user1”"))
+(define s4 (system-login s3 "“user1”"))
+(define s5 (system-login s4 "“user0”"))
