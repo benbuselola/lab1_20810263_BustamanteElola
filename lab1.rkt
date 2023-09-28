@@ -1,13 +1,5 @@
 #lang racket
 
-#|(define chatbot
-  (lambda( id mensaje . opciones)
-    (list ' id mensaje opciones)))
-
-(define sistema
-  (lambda(nombre . chatbots)
-    (list ' sistema nombre chatbots)))
-|#
 (define id-option
   (lambda (option)
     (car option)))
