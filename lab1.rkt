@@ -137,9 +137,14 @@
   (lambda (system user)
     (if (= (length(system-loginList system)) 0)
         (if (boolean? (member user (system-userList system)))
-            "Añada el usuario!"
+            (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(system-loginList system)(system-chatbot system))
             (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(append (system-loginList system)(list user))(system-chatbot system)))
-        "Ya existe un usuario activo")))
+        (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(system-loginList system)(system-chatbot system)))))
+(define system-logout
+  (lambda (system)
+    (if (= (length (system-loginList system)) 1)
+        (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(list)(system-chatbot system))
+         (list (system-name system)(system-InitialChatbotCodeLink system)(system-chatHistory system)(system-userList system)(system-loginList system)(system-chatbot system)))))
 (define system-name
   (lambda (system)
   (car system)))
