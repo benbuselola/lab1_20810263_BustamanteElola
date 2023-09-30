@@ -19,11 +19,22 @@
 (define Keyword-option
   (lambda (option)
     (car(cddddr option))))
-
+#|
+Nombre de la función: option
+Dominio: code x message x ChatbotLink x FlowCodeLink x Keyword
+Recorrido: option
+Descripción: Esta función permite crear una representación de una opcion, la cual recibe un codigo, mensaje , codigo del chatbot , un codigo del flow y cero
+o más palabras clave|#
 (define option
   (lambda(code message ChatbotCodeLink FlowCodeLink . Keyword)
     (list code message ChatbotCodeLink FlowCodeLink Keyword)))
-
+#|
+Nombre de la función: flow 
+Dominio: id x name x option
+Recorrido: flow
+Descripción: Función la cual permite crear un flow que toma como parametros un id, su nombre y 0 o más opciones. Acá , se verifica
+que no se entreguen opciones repetidas y se realiza dicha verificación en base a la id que posee la opcion llamando a una función recursiva de
+tipo natural|#
 (define flow
   (lambda(id name . option)
     (cond
