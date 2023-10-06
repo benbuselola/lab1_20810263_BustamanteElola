@@ -1,7 +1,9 @@
 #lang racket
 (provide (all-defined-out))
 (require "TDA_option.rkt")
+
 ;CONSTRUCTOR
+
 #|
 Nombre de la función: flow.
 Dominio: id x name x option.
@@ -15,6 +17,8 @@ tipo natural.|#
       [(null? option) (list id name (list ))]
       [(= (length option) 1) (list id name option)]
       [else (list id name (option-dup(remove-duplicates option) (list )))])))
+
+;SELECTORES
 
 #|
 Nombre de la función: flow-id.
@@ -41,11 +45,27 @@ Descripción: Esta función toma un flow como argumento y retorna las options qu
   (lambda (flow)
     (caddr flow)))
 
+;MODIFICADORES
+
+#|
+Nombre de la función: flow-add-option.
+Dominio: flow x option.
+Recorrido: flow.
+Descripción: En esta función, que toma como entrada un flow y una option, añade la option de entrada al flow entregado. Al igual que en el rf3,
+se tiene que verificar que las optionss no se repetian por el id con la diferencia que tiene que ser de forma no recursiva.|#
+(define flow-add-option
+  (lambda (flow option)
+    (if (boolean?(member (id-option option) (map id-option (flow-option flow))))
+        (list (flow-id flow)(flow-name flow)(append (flow-option flow) (list option)))
+        flow)))
+
+;FUNCIONES AUXILIARES
+
 #|
 Nombre de la función: option-dup
 Dominio: option x aux. 
 Recorrido: aux.
-Tipo de recursión: Recursión de cola.
+Tipo de recursión: Recursión de cola, ya que se usa una auxilar para guardar de forma más sencilla las opciones.
 Descripción: Esta función auxiliar toma como valores de entrada las options que provienen de la función flow y un aux que nos va a servir para guardar
 las opciones.El caso base de esta función, es cuando la lista de las opciones sea null y se va a devolver aux
 Para poder verificar la no repetición, se realiza un map de la funcion id-option (la cual devuelve las id asociada a las opciones) y revisa
@@ -59,14 +79,3 @@ con aux intacto. Caso contrario, se hace la llamda recusiva con el resto de la l
         (if (boolean?(member (caar option) (map id-option (cdr option))))
         (option-dup (cdr option) (append aux (list (car option))))
         (option-dup (cdr option) aux)))))
-#|
-Nombre de la función: flow-add-option.
-Dominio: flow x option.
-Recorrido: flow.
-Descripción: En esta función, que toma como entrada un flow y una option, añade la option de entrada al flow entregado. Al igual que en el rf3,
-se tiene que verificar que las optionss no se repetian por el id con la diferencia que tiene que ser de forma no recursiva.|#
-(define flow-add-option
-  (lambda (flow option)
-    (if (boolean?(member (id-option option) (map id-option (flow-option flow))))
-        (list (flow-id flow)(flow-name flow)(append (flow-option flow) (list option)))
-        flow)))

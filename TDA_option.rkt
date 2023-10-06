@@ -1,5 +1,7 @@
 #lang racket
 (provide (all-defined-out))
+;CONSTRUCTOR
+
 #|
 Nombre de la función: option.
 Dominio: code x message x ChatbotLink x FlowCodeLink x Keyword.
@@ -9,6 +11,8 @@ o más palabras clave.|#
 (define option
   (lambda(code message ChatbotCodeLink FlowCodeLink . Keyword)
     (list code message ChatbotCodeLink FlowCodeLink Keyword)))
+
+;SELECTORES
 
 #|
 Nombre de la función: id-option.

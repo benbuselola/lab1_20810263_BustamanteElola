@@ -2,6 +2,9 @@
 (provide (all-defined-out))
 (require "TDA_option.rkt")
 (require "TDA_flow.rkt")
+
+;CONSTRUCTOR
+
 #|
 Nombre de la función: chatbot.
 Dominio: chatbotid x name x welcomeMessage x startFlowId x flows.
@@ -15,49 +18,10 @@ que realize la acción de no duplicación.|#
       [(null? flows) (list chatbotid name welcomeMessage startFlowId (list))]
       [(= (length flows) 1) (list chatbotid name welcomeMessage startFlowId flows)]
       [else (list chatbotid name welcomeMessage startFlowId (flow-dup(remove-duplicates flows) (list )))])))
-#|
-Nombre de la función: flow-dup
-Dominio: flow x aux. 
-Recorrido: aux.
-Tipo de recursión: Recursión de cola.
-Descripción: En esta función, se toma como parametros de entrada flows y un aux que va a servir para emplear la recursión de cola.
-Se tiene como caso base, que los flows sea una lista vacía y retorne aux. Para verficiar la no repetición de flows, se realiza
-una consulta que ve si existen ids iguales entre el primer elemento de flows y los demas. Para el caso que no se repita, se realiza un
-append agreando el valor a aux y se hace la llamada con el resto de la lista de flows y el aux modificado. Caso contrario, llamada recursiva
-con el resto de la lista de flow y el aux sin modificar. |#
-(define flow-dup
-  (lambda (flows aux)
-    (if (eq? flows null)
-        aux
-        (if (boolean? (member (caar flows ) (map flow-id (cdr flows))))
-            (flow-dup (cdr flows) (append aux  (car flows)))
-            (flow-dup (cdr flows) aux)
-            )) ))
-#|
-Nombre de la función: chatbot-add-flow .
-Dominio: chatbot x flows.
-Recorrido: chatbot.
-Descripción: La función tiene como finalidad agregar un flow al chatbot. Al igual que las funciones anteriores relacionadas con el chatbot,
-se tiene que ver la no repetición de los flows en base al id y se hace uso de una función externa para dicha tarea|#
-(define chatbot-add-flow
-  (lambda (chatbot flow)
-    (list (chatbot-chatbotid chatbot) (chatbot-name chatbot) (chatbot-welcomeMessage chatbot) (chatbot-startFlowId chatbot) (flow-dup-cb flow (chatbot-flows chatbot) (list )))))
-#|Nombre de la función: flow-dup-cb.
-Dominio: new-flow x flow x aux. 
-Recorrido: aux.
-Tipo de recursión: Recursión de cola.
-Descripción:. Esta función verifica que el new-flow que se desea ingresar a la lista original de flows asociada al chatbot, no tenga una id
-similar. El caso base es cuando la lista de flows es null y retorna el aux con el new-flow agregado. Para poder verificar la no repetición, hay que ver que la id del
-new-flow no se encuentre repetida en la lista de flows. Si se encuentra repetida, se devuelve la lista de flows. Caso contrario, se
-llama a la función con el new-flow, el resto de la lista de flows y el aux con el primer flow de la lista proveniente del chatbot.|#
-(define flow-dup-cb
-  (lambda (new-flow flows aux)
-    (if (eq? flows null)
-        (append aux (list new-flow))
-        (if (boolean? (member (flow-id new-flow) (map flow-id flows)))
-            (flow-dup-cb  new-flow (cdr flows) (append aux  (car flows)))
-            flows
-            )) ))
+
+
+;SELECTORES
+
 #|
 Nombre de la función: chatbot-chatbotid.
 Dominio: chatbot.
@@ -98,3 +62,52 @@ Descripción: La función toma el chatbot y entrega la lista de flows asociada.|
 (define chatbot-flows
   (lambda (chatbot)
     (car(cddddr chatbot))))
+
+;MODIFICADORES
+
+#|
+Nombre de la función: chatbot-add-flow .
+Dominio: chatbot x flows.
+Recorrido: chatbot.
+Descripción: La función tiene como finalidad agregar un flow al chatbot. Al igual que las funciones anteriores relacionadas con el chatbot,
+se tiene que ver la no repetición de los flows en base al id y se hace uso de una función externa para dicha tarea|#
+(define chatbot-add-flow
+  (lambda (chatbot flow)
+    (list (chatbot-chatbotid chatbot) (chatbot-name chatbot) (chatbot-welcomeMessage chatbot) (chatbot-startFlowId chatbot) (flow-dup-cb flow (chatbot-flows chatbot) (list )))))
+
+;FUNCIONES AUXILIARES
+
+#|
+Nombre de la función: flow-dup
+Dominio: flow x aux. 
+Recorrido: aux.
+Tipo de recursión: Recursión de cola.
+Descripción: En esta función, se toma como parametros de entrada flows y un aux que va a servir para emplear la recursión de cola.
+Se tiene como caso base, que los flows sea una lista vacía y retorne aux. Para verficiar la no repetición de flows, se realiza
+una consulta que ve si existen ids iguales entre el primer elemento de flows y los demas. Para el caso que no se repita, se realiza un
+append agreando el valor a aux y se hace la llamada con el resto de la lista de flows y el aux modificado. Caso contrario, llamada recursiva
+con el resto de la lista de flow y el aux sin modificar. |#
+(define flow-dup
+  (lambda (flows aux)
+    (if (eq? flows null)
+        aux
+        (if (boolean? (member (caar flows ) (map flow-id (cdr flows))))
+            (flow-dup (cdr flows) (append aux  (car flows)))
+            (flow-dup (cdr flows) aux)
+            )) ))
+#|Nombre de la función: flow-dup-cb.
+Dominio: new-flow x flow x aux. 
+Recorrido: aux.
+Tipo de recursión: Recursión de cola.
+Descripción:. Esta función verifica que el new-flow que se desea ingresar a la lista original de flows asociada al chatbot, no tenga una id
+similar. El caso base es cuando la lista de flows es null y retorna el aux con el new-flow agregado. Para poder verificar la no repetición, hay que ver que la id del
+new-flow no se encuentre repetida en la lista de flows. Si se encuentra repetida, se devuelve la lista de flows. Caso contrario, se
+llama a la función con el new-flow, el resto de la lista de flows y el aux con el primer flow de la lista proveniente del chatbot.|#
+(define flow-dup-cb
+  (lambda (new-flow flows aux)
+    (if (eq? flows null)
+        (append aux (list new-flow))
+        (if (boolean? (member (flow-id new-flow) (map flow-id flows)))
+            (flow-dup-cb  new-flow (cdr flows) (append aux  (car flows)))
+            flows
+            )) ))
