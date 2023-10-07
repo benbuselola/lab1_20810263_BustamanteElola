@@ -129,14 +129,22 @@ Descripción: .|#
 
 (define system-talk-rec
   (lambda (system message)
-    (if (null? (system-loginList))
+    (if (null? (system-loginList system))
         system
-        (buscar-flow (system-chatbot system) message ))))
+        (list (system-name system)(system-InitialChatbotCodeLink system)(cons (buscar-chatbot (system-chatbot system) (system-InitialChatbotCodeLink system) )(system-chatHistory system))(system-userList system)(list)(system-chatbot system)))))
 (define buscar-flow
   (lambda (chatbot flow code message)
     (if (null? flow)
         "hola"
         "a")))
+
+
+(define (buscar-chatbot list-chatbot message)
+  (if (equal? (caar list-chatbot) message)
+      (list-ref(car list-chatbot) 4)
+      (buscar-chatbot (cdr list-chatbot) message)))
+
+
 ;FUNCIONES AUXILIARES
 #|
 Nombre de la función: chatbot-dup.
