@@ -125,7 +125,8 @@ Nombre de la función: system-talk-rec.
 Dominio: system x message (string).
 Recorrido: system.
 Tipo de recursión: Recursión
-Descripción: .|#
+Descripción: Funcion la cual permite interactuar con el chatbot. Tiene que existir un usuario registrado previamente y entrega el flujo entre
+chatbots que recorre el usuario a partir del mensaje ingresado|#
 
 (define system-talk-rec
   (lambda (system message)
