@@ -9,15 +9,30 @@
 Nombre de la función: system.
 Dominio: name x InitialChatbotCodeLink x chatbot.
 Recorrido: system.
+Tipo de recursión: Recursión de cola.
 Descripción: Función la cual crea el system, que tiene como parametros de entrada el nombre, el InitialChatbotCodeLink y 0 o más chatbots. Con estos
 argumentos se crea una lista representando un system.|#
 (define system
   (lambda (name InitialChatbotCodeLink . chatbot)
+    (define chatbot-dup
+  (lambda (chatbot aux)
+    (if (eq? chatbot null)
+        aux
+        (if (boolean?(member (chatbot-chatbotid (car chatbot)) (map chatbot-chatbotid (cdr chatbot))))
+        (chatbot-dup (cdr chatbot) (append aux (list (car chatbot))))
+        (chatbot-dup (cdr chatbot) aux)))))
+
     (cond
       [(null? chatbot) (list name InitialChatbotCodeLink (list ) (list ) (list ) (list ))]
       [(= (length chatbot) 1) (list name InitialChatbotCodeLink (list ) (list ) (list ) chatbot)]
       [else (list name InitialChatbotCodeLink (list ) (list ) (list ) (chatbot-dup chatbot (list )))])))
-
+#|
+Nombre de la función: chatbot-dup.
+Dominio: chatbot x aux.
+Recorrido: aux.
+Tipo de recursión: Recursión de cola.
+Descripción: Función auxiliar la cual, mediante la verificación del id del chatbot, revisa que no existan repeticiones en los chatbots mediante
+el uso de un auxilar y con recursión de cola.|#
 ;SELECTORES
 #|
 Nombre de la función: system-name.
@@ -133,31 +148,32 @@ chatbots que recorre el usuario a partir del mensaje ingresado|#
     (if (null? (system-loginList system))
         system
         (list (system-name system)(system-InitialChatbotCodeLink system)(cons (buscar-chatbot (system-chatbot system) (system-InitialChatbotCodeLink system) )(system-chatHistory system))(system-userList system)(list)(system-chatbot system)))))
+
+
+;FUNCIONES AUXILIARES
+#|
+Nombre de la función: buscar-flow
+Dominio: chatbot x flow x code x message
+Recorrido: flow
+Descripción: Esta función busca un flow en un chatbot específico en base al code y el message proporcionados. 
+Si encuentra el flujo, devuelve el flujo correspondiente, de lo contrario,lo sigue buscando.
+|#
 (define buscar-flow
   (lambda (chatbot flow code message)
     (if (null? flow)
         "hola"
         "a")))
 
-
-(define (buscar-chatbot list-chatbot message)
+#|
+Nombre de la función: buscar-chatbot
+Dominio: lista-de-chatbots x mensaje
+Recorrido: chatbot
+Tipo de recursión: Recursión natural
+Descripción: Esta función busca un chatbot en una lista de chatbots basándose en un mensaje específico. 
+Si encuentra el chatbot, devuelve el flujo inicial del chatbot.
+|#
+(define buscar-chatbot 
+  (lambda (list-chatbot message)
   (if (equal? (caar list-chatbot) message)
       (list-ref(car list-chatbot) 4)
-      (buscar-chatbot (cdr list-chatbot) message)))
-
-
-;FUNCIONES AUXILIARES
-#|
-Nombre de la función: chatbot-dup.
-Dominio: chatbot x aux.
-Recorrido: aux.
-Tipo de recursión: Recursión de cola.
-Descripción: Función auxiliar la cual, mediante la verificación del id del chatbot, revisa que no existan repeticiones en los chatbots mediante
-el uso de un auxilar y con recursión de cola.|#
-(define chatbot-dup
-  (lambda (chatbot aux)
-    (if (eq? chatbot null)
-        aux
-        (if (boolean?(member (chatbot-chatbotid (car chatbot)) (map chatbot-chatbotid (cdr chatbot))))
-        (chatbot-dup (cdr chatbot) (append aux (list (car chatbot))))
-        (chatbot-dup (cdr chatbot) aux)))))
+      (buscar-chatbot (cdr list-chatbot) message))))

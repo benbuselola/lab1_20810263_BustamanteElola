@@ -8,15 +8,34 @@
 Nombre de la función: flow.
 Dominio: id x name x option.
 Recorrido: flow.
+Tipo de recursión: Recursión de cola, ya que se usa una auxilar para guardar de forma más sencilla las opciones.
 Descripción: Función la cual permite crear un flow que toma como parametros un id, su nombre y 0 o más opciones. Acá , se verifica
 que no se entreguen opciones repetidas y se realiza dicha verificación en base a la id que posee la opcion llamando a una función recursiva de
-tipo natural.|#
+tipo cola.|#
+
 (define flow
-  (lambda(id name . option)
+  (lambda (id name . option)
+(define option-dup
+  (lambda (option aux)
+    (if (eq? option null)
+        aux
+        (if (boolean?(member (caar option) (map id-option (cdr option))))
+        (option-dup (cdr option) (append aux (list (car option))))
+        (option-dup (cdr option) aux)))))
     (cond
       [(null? option) (list id name (list ))]
       [(= (length option) 1) (list id name option)]
       [else (list id name (option-dup(remove-duplicates option) (list )))])))
+#|
+Nombre de la función: option-dup
+Dominio: option x aux. 
+Recorrido: aux.
+Tipo de recursión: Recursión de cola
+Descripción: Esta función auxiliar toma como valores de entrada las options que provienen de la función flow y un aux que nos va a servir para guardar
+las opciones.El caso base de esta función, es cuando la lista de las opciones sea null y se va a devolver aux
+Para poder verificar la no repetición, se realiza un map de la funcion id-option (la cual devuelve las id asociada a las opciones) y revisa
+si la id de la funcion que se quiera agregar no sea igual. En el caso que sean iguales, se hace llamada recursiva con la lista que queda de opciones y
+con aux intacto. Caso contrario, se hace la llamda recusiva con el resto de la lista de opciones y el auxiliar va a contener la opcion no repetida.|#
 
 ;SELECTORES
 
@@ -61,21 +80,3 @@ se tiene que verificar que las optionss no se repetian por el id con la diferenc
 
 ;FUNCIONES AUXILIARES
 
-#|
-Nombre de la función: option-dup
-Dominio: option x aux. 
-Recorrido: aux.
-Tipo de recursión: Recursión de cola, ya que se usa una auxilar para guardar de forma más sencilla las opciones.
-Descripción: Esta función auxiliar toma como valores de entrada las options que provienen de la función flow y un aux que nos va a servir para guardar
-las opciones.El caso base de esta función, es cuando la lista de las opciones sea null y se va a devolver aux
-Para poder verificar la no repetición, se realiza un map de la funcion id-option (la cual devuelve las id asociada a las opciones) y revisa
-si la id de la funcion que se quiera agregar no sea igual. En el caso que sean iguales, se hace llamada recursiva con la lista que queda de opciones y
-con aux intacto. Caso contrario, se hace la llamda recusiva con el resto de la lista de opciones y el auxiliar va a contener la opcion no repetida.|#
-
-(define option-dup
-  (lambda (option aux)
-    (if (eq? option null)
-        aux
-        (if (boolean?(member (caar option) (map id-option (cdr option))))
-        (option-dup (cdr option) (append aux (list (car option))))
-        (option-dup (cdr option) aux)))))
