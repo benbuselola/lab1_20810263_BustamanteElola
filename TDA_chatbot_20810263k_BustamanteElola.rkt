@@ -86,27 +86,27 @@ Descripción: La función toma el chatbot y entrega la lista de flows asociada.|
 
 #|
 Nombre de la función: chatbot-add-flow .
-Dominio: chatbot x flows.
+Dominio: chatbot x flow.
 Recorrido: chatbot.
 Tipo de recursión: Recursión de cola.
 Descripción: La función tiene como finalidad agregar un flow al chatbot. Al igual que las funciones anteriores relacionadas con el chatbot,
 se tiene que ver la no repetición de los flows en base al id y se hace uso de una función externa para dicha tarea|#
 (define chatbot-add-flow
-  (lambda (chatbot new-flow)
+  (lambda (chatbot flow)
     (define flow-dup-cb
       (lambda (flows aux)
         (if (null? flows)
-            (append aux (list new-flow))
-            (if (equal? (flow-id new-flow) (flow-id (car flows)))
+            (append aux (list flow))
+            (if (equal? (flow-id flow) (flow-id (car flows)))
                 flows
                 (flow-dup-cb (cdr flows) (append aux (list (car flows))))))))
     (list (chatbot-chatbotid chatbot) (chatbot-name chatbot) (chatbot-welcomeMessage chatbot) (chatbot-startFlowId chatbot) (flow-dup-cb (chatbot-flows chatbot) null))))
 
 #|Nombre de la función: flow-dup-cb.
-Dominio: new-flow x flow x aux. 
+Dominio: flow x aux. 
 Recorrido: aux.
 Tipo de recursión: Recursión de cola.
-Descripción:. Esta función verifica que el new-flow que se desea ingresar a la lista original de flows asociada al chatbot, no tenga una id
-similar. El caso base es cuando la lista de flows es null y retorna el aux con el new-flow agregado. Para poder verificar la no repetición, hay que ver que la id del
-new-flow no se encuentre repetida en la lista de flows. Si se encuentra repetida, se devuelve la lista de flows. Caso contrario, se
-llama a la función con el new-flow, el resto de la lista de flows y el aux con el primer flow de la lista proveniente del chatbot.|#
+Descripción:. Esta función verifica que el flow que se desea ingresar a la lista original de flows asociada al chatbot, no tenga una id
+similar. El caso base es cuando la lista de flows es null y retorna el aux con el flow agregado. Para poder verificar la no repetición, hay que ver que la id del
+flow no se encuentre repetida en la lista de flows. Si se encuentra repetida, se devuelve la lista de flows. Caso contrario, se
+llama a la función con el flow, el resto de la lista de flows y el aux con el primer flow de la lista proveniente del chatbot.|#
